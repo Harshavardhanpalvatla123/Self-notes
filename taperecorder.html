@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tape Recorder</title>
+<style>
+  :root { --bg:#f6f5f1; --ink:#111; --dim:#9a9890; --accent:#d23b2a; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#111110; --ink:#ecebe6; --dim:#6b6a64; --accent:#ff6a55; } }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--ink); font-family:ui-monospace,Menlo,Consolas,monospace; }
+  body { display:grid; place-items:center; padding:16px; box-sizing:border-box; }
+  svg { width:min(92vw,640px); height:auto; fill:none; stroke:var(--ink); stroke-width:1; stroke-linecap:round; stroke-linejoin:round; }
+  text { fill:var(--ink); stroke:none; font-size:5px; letter-spacing:.4px; }
+  .dim { stroke:var(--dim); } .dimtxt { fill:var(--dim); }
+  .btn { cursor:pointer; } .btn rect.hit { fill:transparent; stroke:var(--ink); }
+  .btn:hover rect.hit, .btn:focus-visible rect.hit { stroke:var(--accent); }
+  .btn.on rect.hit { stroke:var(--accent); fill:color-mix(in srgb,var(--accent) 12%,transparent); }
+  .btn .ico { stroke:var(--ink); } .btn.on .ico { stroke:var(--accent); }
+  .rec.on { stroke:var(--accent); } #led { fill:var(--dim); stroke:none; } #led.on { fill:var(--accent); }
+  #bars line { stroke:var(--ink); }
+  .hint { position:fixed; bottom:12px; left:0; right:0; text-align:center; font-size:11px; color:var(--dim); }
+</style>
+</head>
+<body>
+<svg viewBox="0 0 160 110" role="img" aria-label="Animated hairline tape recorder">
+  <!-- body -->
+  <rect x="4.5" y="4.5" width="151" height="101" rx="7"/>
+  <!-- cassette -->
+  <rect x="16.5" y="12.5" width="127" height="52" rx="4"/>
+  <path d="M30 64.5l5-8h90l5 8" class="dim"/>
+  <!-- window -->
+  <rect x="38.5" y="22.5" width="83" height="26" rx="13"/>
+  <!-- tape between reels -->
+  <path id="tapeTop" d="" /><path id="tapeBot" d=""/>
+  <!-- tape packs (radius animated) -->
+  <circle id="packL" cx="58" cy="35.5" r="10" class="dim"/>
+  <circle id="packR" cx="102" cy="35.5" r="6" class="dim"/>
+  <!-- reels -->
+  <g id="reelL" transform="translate(58 35.5)">
+    <circle r="5"/><circle r="1.5"/>
+    <path d="M0-5V-1.5M4.3 2.5L1.3.75M-4.3 2.5L-1.3.75"/>
+  </g>
+  <g id="reelR" transform="translate(102 35.5)">
+    <circle r="5"/><circle r="1.5"/>
+    <path d="M0-5V-1.5M4.3 2.5L1.3.75M-4.3 2.5L-1.3.75"/>
+  </g>
+  <!-- label -->
+  <text x="22" y="19" class="dimtxt">SIDE A</text>
+  <text x="138" y="19" text-anchor="end" class="dimtxt">C-60</text>
+
+  <!-- counter -->
+  <rect x="16.5" y="72.5" width="34" height="14" rx="2"/>
+  <text id="counter" x="33.5" y="82.2" text-anchor="middle" style="font-size:7px">000:00</text>
+  <text x="33.5" y="92.5" text-anchor="middle" class="dimtxt" style="font-size:3.6px">COUNTER</text>
+
+  <!-- VU meter -->
+  <rect x="56.5" y="72.5" width="40" height="14" rx="2"/>
+  <g id="bars"></g>
+  <text x="76.5" y="92.5" text-anchor="middle" class="dimtxt" style="font-size:3.6px">LEVEL</text>
+
+  <!-- rec led -->
+  <circle id="led" cx="104" cy="79.5" r="2.2"/>
+  <text x="108" y="81" class="dimtxt" style="font-size:3.6px">REC</text>
+
+  <!-- buttons -->
+  <g id="buttons">
+    <g class="btn" data-act="rew" tabindex="0" role="button" aria-label="Rewind"><rect class="hit" x="16.5" y="94.5" width="22" height="8" rx="2"/><path class="ico" d="M31 96.8l-4 1.7 4 1.7zM27 96.8l-4 1.7 4 1.7z"/></g>
+    <g class="btn" data-act="play" tabindex="0" role="button" aria-label="Play"><rect class="hit" x="41.5" y="94.5" width="22" height="8" rx="2"/><path class="ico" d="M49.5 96.6l5.5 1.9-5.5 1.9z"/></g>
+    <g class="btn" data-act="ff" tabindex="0" role="button" aria-label="Fast forward"><rect class="hit" x="66.5" y="94.5" width="22" height="8" rx="2"/><path class="ico" d="M74 96.8l4 1.7-4 1.7zM78 96.8l4 1.7-4 1.7z"/></g>
+    <g class="btn" data-act="stop" tabindex="0" role="button" aria-label="Stop"><rect class="hit" x="91.5" y="94.5" width="22" height="8" rx="2"/><rect class="ico" x="99" y="96.5" width="4" height="4"/></g>
+    <g class="btn rec" data-act="rec" tabindex="0" role="button" aria-label="Record"><rect class="hit" x="116.5" y="94.5" width="22" height="8" rx="2"/><circle class="ico" cx="127.5" cy="98.5" r="2"/></g>
+  </g>
+
+  <!-- speaker -->
+  <g class="dim"><path d="M118 74h20M118 77h20M118 80h20M118 83h20M118 86h20" style="display:none"/></g>
+  <g id="grille" class="dim" transform="translate(140 72)"></g>
+</svg>
+<div class="hint">Press ▶ to play · ● + ▶ to record · keys: space = play/stop, ←/→ = rew/ff</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg';
+  const L = { x:58, y:35.5 }, R = { x:102, y:35.5 };
+  const TOTAL = 60 * 60;            // C-60 → 3600 s of tape
+  const R_MIN = 6, R_MAX = 12;
+  const rad = p => R_MIN + (R_MAX - R_MIN) * p;       // pack radius from progress share
+  let pos = 0, mode = 'stop', recArmed = false, angL = 0, angR = 0, last = performance.now();
+
+  // VU bars
+  const bars = [];
+  for (let i = 0; i < 12; i++) {
+    const l = document.createElementNS(NS, 'line');
+    const x = 60 + i * 3; l.setAttribute('x1', x); l.setAttribute('x2', x);
+    l.setAttribute('y1', 84); l.setAttribute('y2', 84); $('bars').appendChild(l); bars.push(l);
+  }
+  let level = 0;
+
+  const speed = { stop:0, play:1, ff:12, rew:-12 };
+  const buttons = [...document.querySelectorAll('.btn')];
+
+  function setMode(m) {
+    if (m === 'rec') { recArmed = !recArmed; if (!recArmed && mode === 'play') {} refresh(); return; }
+    mode = m;
+    if (m !== 'play') { /* recording only runs with play */ }
+    refresh();
+  }
+  function refresh() {
+    buttons.forEach(b => {
+      const a = b.dataset.act;
+      b.classList.toggle('on', a === mode && a !== 'stop' || (a === 'rec' && recArmed) || (a === 'stop' && mode === 'stop' && false));
+    });
+    $('led').classList.toggle('on', recArmed && mode === 'play');
+  }
+  buttons.forEach(b => {
+    const go = () => setMode(b.dataset.act);
+    b.addEventListener('click', go);
+    b.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+  });
+  addEventListener('keydown', e => {
+    if (e.code === 'Space') { e.preventDefault(); setMode(mode === 'play' ? 'stop' : 'play'); }
+    if (e.key === 'ArrowRight') setMode('ff');
+    if (e.key === 'ArrowLeft') setMode('rew');
+    if (e.key === 'r') setMode('rec');
+  });
+
+  function tapePath() {
+    const rl = rad(1 - pos / TOTAL), rr = rad(pos / TOTAL);
+    $('packL').setAttribute('r', rl); $('packR').setAttribute('r', rr);
+    // tape runs from the bottom of each pack across the head area
+    const yb = 48.5 - 2;
+    $('tapeTop').setAttribute('d', `M${L.x - rl} ${L.y}V${L.y}`); // (kept empty visually)
+    $('tapeBot').setAttribute('d', `M${L.x} ${L.y + rl}L${R.x} ${R.y + rr}`);
+  }
+
+  function fmt(s) {
+    s = Math.max(0, Math.floor(s));
+    return String(Math.floor(s / 60)).padStart(3, '0') + ':' + String(s % 60).padStart(2, '0');
+  }
+
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    const v = speed[mode];
+    pos = Math.min(TOTAL, Math.max(0, pos + v * dt * 3));  // 3× so progress is visible in a demo
+    if ((pos <= 0 && v < 0) || (pos >= TOTAL && v > 0)) { mode = 'stop'; refresh(); }
+
+    // reels turn: supply reel (left) slower as pack shrinks, take-up reel (right) slower as it grows
+    const rl = rad(1 - pos / TOTAL), rr = rad(pos / TOTAL);
+    const lin = v * 120;                      // tape linear speed (deg·px / s)
+    angL += (lin / rl) * dt * 3;
+    angR += (lin / rr) * dt * 3;
+    $('reelL').setAttribute('transform', `translate(${L.x} ${L.y}) rotate(${angL})`);
+    $('reelR').setAttribute('transform', `translate(${R.x} ${R.y}) rotate(${angR})`);
+    tapePath();
+    $('counter').textContent = fmt(pos);
+
+    // VU meter: lively when playing, flickers harder while recording
+    const target = mode === 'play' ? (recArmed ? .55 : .4) + Math.random() * .45 : (v ? .2 * Math.random() : 0);
+    level += (target - level) * .35;
+    const lit = Math.round(level * bars.length);
+    bars.forEach((b, i) => b.setAttribute('y2', i < lit ? 76 + (i % 2 ? 1.5 : 0) : 84));
+    $('led').style.opacity = (recArmed && mode === 'play') ? (Math.floor(now / 500) % 2 ? .35 : 1) : 1;
+
+    requestAnimationFrame(frame);
+  }
+
+  // speaker grille
+  const g = $('grille');
+  for (let i = 0; i < 5; i++) {
+    const p = document.createElementNS(NS, 'path'); p.setAttribute('d', `M-1 ${i * 3}h0`); g.appendChild(p);
+  }
+
+  refresh(); requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
