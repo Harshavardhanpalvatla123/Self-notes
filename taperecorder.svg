@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="256" height="256" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" color="#111">
+  <title>Tape recorder</title>
+  <!-- body -->
+  <rect x="6.5" y="12.5" width="51" height="39" rx="4"/>
+  <!-- cassette window -->
+  <rect x="12.5" y="18.5" width="39" height="18" rx="2"/>
+  <!-- reels -->
+  <circle cx="23" cy="27.5" r="5.5"/>
+  <circle cx="23" cy="27.5" r="1.5"/>
+  <path d="M23 22v2.5M23 30.5V33M18 27.5h2.5M25.5 27.5H28"/>
+  <circle cx="41" cy="27.5" r="5.5"/>
+  <circle cx="41" cy="27.5" r="1.5"/>
+  <path d="M41 22v2.5M41 30.5V33M36 27.5h2.5M43.5 27.5H46"/>
+  <!-- tape path -->
+  <path d="M23 33h18"/>
+  <!-- speaker grille -->
+  <path d="M13 42h14M13 45h14M13 48h14"/>
+  <!-- controls -->
+  <circle cx="35" cy="45" r="2.5"/>
+  <rect x="40.5" y="42.5" width="5" height="5" rx="1"/>
+  <path d="M49 42.5l4 2.5-4 2.5z"/>
+  <!-- antenna / handle -->
+  <path d="M14 12.5V8.5h12v4"/>
+</svg>
